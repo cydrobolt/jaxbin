@@ -1,7 +1,6 @@
-from flask import Flask
-from flask import url_for, render_template, redirect, session, request, abort
+from flask import Flask, render_template, request, abort
 from models import *
-import uuid
+from util import generate_token
 
 app = Flask('jaxbin')
 
@@ -9,27 +8,25 @@ app = Flask('jaxbin')
 def index():
     return render_template("index.html")
 
-@app.route("/createBin", methods=['GET', 'POST'])
-def createBin():
-    binData = request.form["binData"]
-    bin_id = str(uuid.uuid4())
+@app.route("/create_bin", methods=['GET', 'POST'])
+def create_bin():
+    bin_data = request.form["binData"]
+    bin_id = generate_token(6)
 
     Bin.create(
         p_id = bin_id,
-        content = binData
+        content = bin_data
     )
 
-    if not binData:
+    if not bin_data:
         abort(400, "Invalid Request")
 
     return bin_id
 
-@app.route("/bin/<bin_id>")
-def showBin(bin_id):
+@app.route("/<bin_id>")
+def show_bin(bin_id):
     bin_obj = Bin.select().where(Bin.p_id == bin_id).first()
-
     return render_template("show_paste.html", paste=bin_obj)
-
 
 # Open & close db connections
 @app.before_request

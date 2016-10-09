@@ -13,19 +13,24 @@ $(function () {
     $("#createBin").click(function () {
         var binData = $('#jaxInput').val();
 
+        if (binData.length < 1) {
+            // Ignore empty bin creation
+            return;
+        }
+
         $.ajax({
             type: "POST",
-            url: "/createBin",
+            url: "/create_bin",
             data: {
                 "binData": binData
             },
 
             success: function (data) {
-                $("#binLink").html("Bin Created: <a target='_blank' href='/bin/" + data + "'>http://" + hostname + "/bin/" + data + "</a>");
+                $("#binLink").html("Bin Created: <a target='_blank' href='/" + data + "'>http://" + hostname + "/" + data + "</a>");
             },
 
             error: function () {
-                alert('ohno');
+                $("#binLink").html("An error occurred while saving your bin.");
             }
         });
     });
